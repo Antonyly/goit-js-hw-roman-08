@@ -19,17 +19,18 @@ function onSubmitForm(e) {
   e.preventDefault();
   e.currentTarget.reset();
   localStorage.removeItem('feedback-form-state');
+  
 }
 
  function dataFromLocalStorage() {
   const data = JSON.parse(localStorage.getItem('feedback-form-state'));
 
-  if (data) {
-    email.value = data.email;
-    message.value = data.message;
-  }
   if (!data) {
-
+    email.value = '';
+    message.value = '';
   }
+  // if (!data) {
+  //   return;
+  // }
 };
 dataFromLocalStorage();
