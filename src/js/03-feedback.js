@@ -1,36 +1,63 @@
 import throttle from 'lodash.throttle';
 
 const form = document.querySelector('.feedback-form');
-form.addEventListener('input', throttle(onFormData, 500));
+const email = document.querySelector('input');
+const message = document.querySelector('textarea');
+
+let formData = {};
+
+form.addEventListener('input', inputValue);
 form.addEventListener('submit', onSubmitForm);
 
-  const email = document.querySelector('input');
-  const message = document.querySelector('textarea');
+function onFormData(el) {
+  const data = JSON.stringify(formData);
+    if(data) {
+    
+   return localStorage.setItem(el, data);
+  } 
+};
 
-const formData = {};
+function dataFromLocalStorage(el) {
+    const data = localStorage.getItem(el);
 
-function onFormData(e) {
-  formData[e.target.name] = e.target.value;
-  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
+  if (data === null) {
+   return el = undefined;
+    
+  } else {
+return JSON.parse(data);
+  }
+};
+
+const objFromLocalStorage = dataFromLocalStorage('feedback-form-state');
+
+if (objFromLocalStorage) {
+  email.value = objFromLocalStorage.email;
+  message.value = objFromLocalStorage.message;
+  formData = objFromLocalStorage;
+} else {
+  email.value = '';
+  message.value = '';
 }
 
 function onSubmitForm(e) {
-  console.log(JSON.parse(localStorage.getItem('feedback-form-state')));
   e.preventDefault();
-  e.currentTarget.reset();
   localStorage.removeItem('feedback-form-state');
-  
-}
-
- function dataFromLocalStorage() {
-  const data = JSON.parse(localStorage.getItem('feedback-form-state'));
-
-  if (!data) {
-    email.value = '';
-    message.value = '';
-  }
-  // if (!data) {
-  //   return;
-  // }
+  form.reset();
+  console.log(formData);
 };
-dataFromLocalStorage();
+
+function inputValue(e) {
+  const {
+    elements: { email, message },
+  } = e.currentTarget;
+
+  if (email.value || message.value) {
+    formData = {
+      email: email.value,
+      message: message.value,
+    };
+
+    throttle(onFormData, 500)('feedback-form-state', formData);
+  }
+};
+
